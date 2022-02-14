@@ -12,7 +12,7 @@ app.get('/api', (req, res) => {
 app.post('/api/posts', verifyToken, (req, res) => {
     jwt.verify(req.token, 'nosecretshere', (err, authData) => {
         if (err) {
-            res.status(403)
+            res.sendStatus(403)
         } else {
             res.json({
                 msg: 'Post Created!',
@@ -30,7 +30,7 @@ app.post('/api/login', (req, res) => {
         email: 'ben@mail.com'
     }
 
-    jwt.sign({user}, 'nosecretshere', (err, token) => {
+    jwt.sign({user}, 'nosecretshere', {expiresIn: '30s'}, (err, token) => {
         res.json({
             token
         })
@@ -40,7 +40,8 @@ app.post('/api/login', (req, res) => {
 function verifyToken(req, res, next) {
     const bearerHeader = req.headers['authorization'];
     if (typeof bearerHeader !== 'undefined') {
-        const token = bearerHeader.split(' ')[1];
+        const bearer = bearerHeader.split(' ');
+        const token = bearer[1];
         req.token = token;
         next();
     } else {
